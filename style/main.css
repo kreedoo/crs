@@ -1,0 +1,564 @@
+*, *:before, *:after {
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	-o-box-sizing: border-box;
+}
+html, body {
+	height: 100%;
+}
+html {
+	font-size: 100px;
+	min-width: 320px;
+}
+body {
+    font: .14rem/1.5 Consolas, "\5FAE\8F6F\96C5\9ED1", "Microsoft Yahei", sans-serif;
+}
+body, ul, ol {
+	margin: 0;
+}
+
+:focus, :active {
+	outline: none;
+}
+
+a,
+a:visited {
+	color: green;
+}
+a:active {
+	color: red;
+}
+
+button, select {
+	text-transform: none;
+}
+
+.clearfix:before,
+.clearfix:after,
+.form-field:before,
+.form-field:after,
+.list-item-row:before,
+.list-item-row:after {
+	content: '';
+	display: table;
+}
+.clearfix:after,
+.form-field:after,
+.list-item-row:after {
+	clear: both;
+	line-height: 0;
+}
+
+.kd-textinput {
+	display: inline-block;
+	vertical-align: middle;
+	border: 1px solid #dcdcdc;
+	padding: .05rem;
+	width: 1.8rem;
+}
+.kd-textinput input,
+.kd-textinput textarea,
+.kd-textinput select {
+	border: none;
+	padding: 0;
+	background: none;
+	box-shadow: none;
+	height: 20px;
+	font: inherit;
+	width: 100%;
+}
+.kd-textinput.number {
+	width: .8rem;
+}
+
+.kd-button,
+.kd-file {
+	display: inline-block;
+	padding: .08rem .16rem;
+	line-height: 1;
+	background: #09f;
+	color: #fff;
+	text-decoration: none;
+	text-align: center;
+}
+.kd-file.has-value {
+    background: #00d412;
+}
+.kd-file {
+    position: relative;
+    overflow: hidden;
+}
+.kd-file input[type="file"] {
+    font-size: 9999em;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+}
+
+.kd-checkbox {
+	display: inline-block;
+	vertical-align: middle;
+	width: .2rem;
+	height: .2rem;
+	font-size: .1rem;
+	position: relative;
+	border: .1em solid #dcdcdc;
+}
+.kd-checkbox input {
+	opacity: 0;
+}
+.kd-checkbox:before {
+	content: '';
+	width: 1.4em;
+	height: .8em;
+	border: solid green;
+	border-width: 0 0 .2em .2em;
+	transform: rotate(-45deg) translate(-50%, -50%);
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin: -.8em 0 0 .1em;
+	display: none;
+}
+.kd-checkbox.checked:before {
+	display: block;
+}
+
+html.loading {
+	overflow: hidden;
+}
+.page-loading {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: #fff;
+	z-index: 9999;
+	color: green;
+	text-align: center;
+	font-size: .22rem;
+}
+.page-loading:before,
+.page-loading-text {
+	display: inline-block;
+	vertical-align: middle;
+}
+.page-loading:before {
+	content: '';
+	height: 100%;
+	width: 0;
+}
+.page-loading-text {
+	max-width: 99%;
+}
+
+.page {
+	width: 93.75%;
+	max-width: 640px;
+	margin: 0 auto;
+}
+
+.message {
+	width: 300px;
+	background: #fff;
+	border-radius: .06rem;
+	box-shadow: 0 0 .04rem rgba(0, 0, 0, .5);
+	position: fixed;
+	top: 20%;
+	left: 50%;
+	transform: translate(-50%, 0);
+	z-index: 9;
+}
+.message-head {
+	color: orange;
+	font-weight: bold;
+	border-radius: .06rem .06rem 0 0;
+	padding: .08rem .2rem .08rem .25rem;
+	box-shadow: 0 .02rem .01rem rgba(0, 0, 0, .05);
+	position: relative;
+}
+.message-head:before {
+	content: '';
+	display: inline-block;
+	vertical-align: middle;
+	width: 0;
+	height: 0;
+	border: solid transparent;
+	border-width: .04rem 0 .04rem .08rem;
+	border-left-color: currentColor;
+	position: absolute;
+	left: .1rem;
+	top: 50%;
+	margin-top: -.04rem;
+}
+.message-body {
+	padding: .2rem .1rem;
+	font-size: .16rem;
+	/*text-align: center;*/
+}
+.message-action .kd-button {
+	float: left;
+	width: 50%;
+	padding: .12rem;
+}
+.message-action .kd-button-msg-confirm {
+	border-radius: 0 0 0 .06rem;
+}
+.message-action .kd-button-msg-cancel {
+	border-radius: 0 0 .06rem;
+	background: #666;
+}
+
+.prompt {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1;
+	width: 100%;
+	min-width: 320px;
+	height: 100%;
+	background: rgba(0, 0, 0, .75);
+	font-size: .16rem;
+}
+.prompt-box {
+	width: 93.75%;
+	max-width: 600px;
+	max-height: 85%;
+	overflow: auto;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	-webkit-transform: translate(-50%, -50%);
+
+	background: #fff;
+	border: 1px solid #efefef;
+	box-shadow: 0 2px 2px rgba(10, 10, 10, .5);
+	border-radius: 5px;
+	padding: .15rem;
+}
+.message-close,
+.prompt-close,
+.filter-item-close {
+	position: absolute;
+	top: .15rem;
+	right: .15rem;
+	display: inline-block;
+	overflow: hidden;
+	width: .2rem;
+	height: .2rem;
+	text-indent: -999em;
+	transform: rotate(45deg);
+}
+.message-close {
+	top: .1rem;
+	right: .1rem;
+}
+.message-close:before,
+.message-close:after,
+.prompt-close:before,
+.prompt-close:after,
+.filter-item-close:before,
+.filter-item-close:after {
+	content: '';
+	display: block;
+	width: 100%;
+	height: 100%;
+	border: 1px solid #000;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+.message-close:before,
+.prompt-close:before,
+.filter-item-close:before {
+	height: 0;
+}
+.message-close:after,
+.prompt-close:after,
+.filter-item-close:after {
+	width: 0;
+}
+.prompt-action {
+	text-align: center;
+	margin: .2rem -.15rem -.15rem;
+}
+.prompt-action .kd-button {
+	float: left;
+	width: 50%;
+	padding-top: .12rem;
+	padding-bottom: .12rem;
+	letter-spacing: .1rem;
+}
+.prompt-action .kd-button-confirm {
+	border-radius: 0 0 0 5px;
+}
+.prompt-action .kd-button-reset {
+	border-radius: 0 0 5px;
+	background: #660;
+}
+
+.nav {
+	list-style: none;
+	padding-left: 0;
+	background: #efefef;
+	margin-bottom: .1rem;
+}
+.nav-item {
+	display: inline-block;
+}
+.nav-link {
+	display: block;
+	padding: .1rem .2rem;
+	color: #000;
+	text-decoration: none;
+}
+.nav-link.active {
+	background: #09f;
+	color: #fff;
+}
+
+.form {}
+.form-title,
+.form-field {
+	margin-bottom: .1rem;
+}
+.form-title {
+	font-size: .18rem;
+}
+.form-field {
+	display: block;
+	border-bottom: 1px solid #efefef;
+}
+.form-field-title {
+	display: block;
+	width: 1.2rem;
+	line-height: .3rem;
+	color: #454545;
+}
+.form-field input:not([type="radio"]):not([type="checkbox"]),
+.form-field select,
+.form-field textarea {
+	border: none;
+	padding: 0;
+	height: .3rem;
+	line-height: .3rem;
+	background: none;
+	font: inherit;
+	box-shadow: none;
+	width: 100%;
+}
+.form-field-newcustomer .form-field-title,
+.form-field-newcustomer .kd-checkbox {
+	float: left;
+}
+.form-field-newcustomer .kd-checkbox {
+	top: .4em;
+}
+.form-field-comment textarea {
+	height: .6rem;
+}
+.form-field-products {
+	margin-top: .1rem;
+}
+.form-field-product {
+	border-bottom: 1px solid #fefefe;
+}
+.form-field-product:last-child {
+	border-bottom-width: 0;
+}
+.form-field-product .form-field-pname,
+.form-field-product .form-field-pprice,
+.form-field-product .form-field-pquantity {
+	float: left;
+	width: 32%;
+	font-size: .14rem;
+}
+.form-field-product .form-field-pname {
+	width: 36%;
+}
+.form-field-product span {
+	line-height: .3rem;
+}
+.form-field-product input:not([type="radio"]):not([type="checkbox"]),
+.form-field-product select {
+	float: none;
+	width: 100%;
+}
+.form-field-product input:not([type="radio"]):not([type="checkbox"]),
+.form-field-product select,
+.form-field-product .kd-checkbox {
+	position: relative;
+	top: -.01rem;
+}
+.form-field-product .form-field-pprice {
+	/*background: #f0f0fe;*/
+}
+.form-field-product .form-field-pprice input:not([type="radio"]):not([type="checkbox"]),
+.form-field-product .form-field-pprice select {
+	width: calc(100% - .3rem);
+}
+.form-field-product .form-field-pquantity input:not([type="radio"]):not([type="checkbox"]) {
+	width: calc(100% - .5rem);
+}
+.button-box-adding-price-rule {
+	text-align: center;
+	font-size: .14rem;
+}
+.button-delete-price-rule,
+.button-adding-price-rule {
+	text-decoration: none;
+}
+.initdata .kd-textinput {
+	display: block;
+	width: 100%;
+}
+.initdata textarea {
+	height: 1.5rem;
+	resize: none;
+}
+.initdata .buttons-box {
+	margin-top: .1rem;
+}
+.initdata .kd-button {
+	float: left;
+	width: 50%;
+	padding: .15rem;
+	font-size: .16rem;
+}
+.initdata .kd-button:first-child {
+	background: green;
+}
+.product-price-rule {
+	color: #999;
+	font-size: .14rem;
+}
+
+@media only screen and (min-width: 600px) {
+	.form-field-title {
+		text-align: right;
+	}
+	.form-field-title,
+	.form-field-body,
+	.form-field input:not([type="radio"]):not([type="checkbox"]),
+	.form-field select {
+		float: left;
+	}
+	.form-field-body,
+	.form-field input:not([type="radio"]):not([type="checkbox"]),
+	.form-field select,
+	.form-field textarea {
+		width: calc(100% - 1.2rem);
+	}
+	.form-field-product input:not([type="radio"]):not([type="checkbox"]),
+	.form-field-product select {
+		float: none;
+	}
+	.form-field-product input:not([type="radio"]):not([type="checkbox"]),
+	.form-field-product select,
+	.form-field-product .kd-checkbox {
+		top: 0;
+	}
+}
+
+.list-counter {
+	text-align: center;
+}
+.list {
+	border-top: 1px solid #efefef;
+	list-style: none;
+	padding-left: 0;
+	counter-reset: list;
+	margin-top: .05rem;
+}
+.list-item {
+	border-bottom: 1px solid #efefef;
+	padding: .1rem .1rem .1rem .4rem;
+	counter-increment: list;
+	position: relative;
+}
+.list-item:nth-child(2n) {
+	background: #f0f0fe;
+}
+.list-item:before {
+	content: counter(list);
+	position: absolute;
+	left: .04rem;
+	top: .04rem;
+	color: #fff;
+	z-index: 1;
+}
+.list-item:after {
+	content: '';
+	display: block;
+	width: 0;
+	height: 0;
+	border: solid transparent;
+	border-width: 0 0 .6rem .4rem;
+	border-left-color: purple;
+	opacity: .5;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+.list-item-action {
+	text-align: right;
+}
+.list-item-button {
+	margin-right: .1rem;
+}
+.list-item-row {
+	margin-top: .1rem;
+}
+.list-item-row:first-child {
+	margin-top: 0;
+}
+.list-item-row span {
+	float: left;
+	width: calc(100% - .8rem);
+}
+.list-item-row span:first-child {
+	width: .8rem;
+}
+.price-rule-title {
+	color: #999;
+}
+
+.filter {
+	margin-bottom: .1rem;
+	text-align: center;
+}
+.filter .kd-textinput {
+	width: 35%;
+	text-align: left;
+}
+.kd-button-start-filter {
+	display: block;
+	margin-top: .1rem;
+}
+.filter-item {
+	margin-bottom: .1rem;
+	position: relative;
+}
+.filter-item-close {
+	vertical-align: middle;
+	position: static;
+	width: .16rem;
+	height: .16rem;
+}
+.add-filter-condition {
+	text-decoration: none;
+}
+.add-filter-condition + .filter-item {
+	margin-top: .1rem;
+}
+@media only screen and (min-width: 480){
+	.filter .kd-textinput {
+		width: 37%;
+	}
+}
