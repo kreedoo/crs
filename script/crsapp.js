@@ -3,7 +3,7 @@
 		var isCustom = window.location.href.indexOf('custom=1') > -1;
 
 		var $user = {
-			token: 'db5402c27b9fe5720ae31ea74fdf0bac0bd0dd47',
+			token: 'b459f4e54ba54a2074699fc5900964fe6f6d9819',
 			fileName: '',
 			filePath: '',
 			sha: '',
