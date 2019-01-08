@@ -198,84 +198,89 @@
 		}
 	}
 
-	var $crsdb = new Database([
-		{
-			name: 'products',
-			fields: {
-				id: { isUnique: true, type: 'number', note: '产品ID' },
-				name: { type: 'string', note: '产品名称(回奶、通乳、熏蒸、骨盆修复)' },
-				price: { type: 'array', note: '产品定价和抽成点数' }
+	function initCRSDB(){
+		var $crsdb = new Database([
+			{
+				name: 'products',
+				fields: {
+					id: { isUnique: true, type: 'number', note: '产品ID' },
+					name: { type: 'string', note: '产品名称(回奶、通乳、熏蒸、骨盆修复)' },
+					price: { type: 'array', note: '产品定价和抽成点数' }
+				},
+				initData: [
+					{
+						name: '回奶',
+						price: [
+							[200, 40]
+						]
+					},
+					{
+						name: '通乳',
+						price: [
+							[300, 100]
+						]
+					},
+					{
+						name: '熏蒸',
+						price: [
+							[39, 20]
+						]
+					},
+					{
+						name: '骨盆修复',
+						price: [
+							[39, 20]
+						]
+					}
+				]
 			},
-			initData: [
-				{
-					name: '回奶',
-					price: [
-						[200, 40]
-					]
-				},
-				{
-					name: '通乳',
-					price: [
-						[300, 100]
-					]
-				},
-				{
-					name: '熏蒸',
-					price: [
-						[39, 20]
-					]
-				},
-				{
-					name: '骨盆修复',
-					price: [
-						[39, 20]
-					]
+			{
+				name: 'customers',
+				fields: {
+					id: { isUnique: true, type: 'number', note: '客户ID' },
+					name: { type: 'string', note: '客户名' },
+					introducer: { type: 'string', note: '介绍人', isNull: true },
+					telephone: { isUnique: true, type: 'number', note: '电话' },
+					address: { type: 'string', note: '地址', isNull: true },
+					deliveryDate: { type: 'string', note: '分娩日期' }
 				}
-			]
-		},
-		{
-			name: 'customers',
-			fields: {
-				id: { isUnique: true, type: 'number', note: '客户ID' },
-				name: { type: 'string', note: '客户名' },
-				introducer: { type: 'string', note: '介绍人', isNull: true },
-				telephone: { isUnique: true, type: 'number', note: '电话' },
-				address: { type: 'string', note: '地址', isNull: true },
-				deliveryDate: { type: 'string', note: '分娩日期' }
-			}
-		},
-		{
-			name: 'deals',
-			fields: {
-				id: { isUnique: true, type: 'number', note: '交易ID' },
-				customerId: { type: 'number', note: '客户ID' },
-				dealDate: { type: 'string', note: '交易日期' },
-				products: { type: 'array', note: '产品' },
-				quantity: { type: 'number', note: '数量' },
-				status: { type: 'string', note: '交易状态' }, // 成交、失单、其他情况
-				comment: { type: 'string', note: '备注', isNull: true },
-				trafficAllowance: { type: 'string,number', note: '交通补贴', isNull: true },
-				companyAllowance: { type: 'string,number', note: '公司补贴', isNull: true }
-			}
-		},
-		{
-			name: 'settings',
-			fields: {
-				id: { isUnique: true, type: 'number', note: '配置ID' },
-				key: { isUnique: true, type: 'string', note: '键值' },
-				name: { type: 'string', note: '配置名称' },
-				value: { type: 'string,number', note: '配置值' }
 			},
-			initData: [
-				{
-					key: 'failAllowance',
-					name: '失单补贴',
-					value: 20
+			{
+				name: 'deals',
+				fields: {
+					id: { isUnique: true, type: 'number', note: '交易ID' },
+					customerId: { type: 'number', note: '客户ID' },
+					dealDate: { type: 'string', note: '交易日期' },
+					products: { type: 'array', note: '产品' },
+					quantity: { type: 'number', note: '数量' },
+					status: { type: 'string', note: '交易状态' }, // 成交、失单、其他情况
+					comment: { type: 'string', note: '备注', isNull: true },
+					trafficAllowance: { type: 'string,number', note: '交通补贴', isNull: true },
+					companyAllowance: { type: 'string,number', note: '公司补贴', isNull: true }
 				}
-			]
-		}
-	], 'storage');
+			},
+			{
+				name: 'settings',
+				fields: {
+					id: { isUnique: true, type: 'number', note: '配置ID' },
+					key: { isUnique: true, type: 'string', note: '键值' },
+					name: { type: 'string', note: '配置名称' },
+					value: { type: 'string,number', note: '配置值' }
+				},
+				initData: [
+					{
+						key: 'failAllowance',
+						name: '失单补贴',
+						value: 20
+					}
+				]
+			}
+		], 'storage');
 
-	$crsdb.save();
-	window.$crsdb = $crsdb;
+		$crsdb.save();
+		window.$crsdb = $crsdb;
+	}
+
+	window.$crsdb = null;
+	window.initCRSDB = initCRSDB;
 })();

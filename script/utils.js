@@ -33,8 +33,21 @@
     function deleteStorage(key){
     	return window.localStorage.removeItem(key);
     }
-    function base64(s){
-        return window.btoa(unescape(encodeURIComponent(s)));
+    function a2b(s, levels = 2){
+        if(typeof Base64 === 'undefined') return s;
+
+        s = Base64.encode(s);
+        s = s.replace(/^[\s\r\n\t]+|[\s\r\n\t]+$/g, '').replace(/^(.{3})(.*)(.{2})$/, '$2$1$3');
+
+        return levels <= 1 ? s : a2b(s, levels - 1);
+    }
+    function b2a(s, levels = 2){
+        if(typeof Base64 === 'undefined') return s;
+
+        s = s.replace(/^[\s\r\n\t]+|[\s\r\n\t]+$/g, '').replace(/^(.*)(.{3})(.{2})$/, '$2$1$3');
+        s = Base64.decode(s);
+
+        return levels <= 1 ? s : b2a(s, levels - 1);
     }
 
     window.utils = {
@@ -45,6 +58,7 @@
     	getStorage,
     	setStorage,
     	deleteStorage,
-        base64
+        a2b,
+        b2a
     };
 })();

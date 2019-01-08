@@ -562,3 +562,14 @@ html.loading {
 		width: 37%;
 	}
 }
+
+.kd-buttons {
+	text-align: center;
+	margin: .2rem 0 0;
+}
+.kd-buttons .kd-button {
+	margin: 0 .05rem;
+}
+.kd-buttons .kd-button-up {
+	background: green;
+}

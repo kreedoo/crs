@@ -7,7 +7,7 @@
 <link href="style/main.css" rel="stylesheet">
 </head>
 <body>
-<div class="page" id="app">
+<div class="page" id="app" style="display: none;">
 	<ul class="nav">
 		<li v-for="item in navItems" :data-id="item.id" :key="item.id" class="nav-item" v-if="(isCustom && item.id === 'initdata') || item.id !== 'initdata'"><a class="nav-link" href="javascript:;" :class="{active: currentNavItem === item.id}" @click="currentNavItem = item.id">{{ item.name }}表</a></li>
 	</ul>
@@ -161,8 +161,6 @@
 		</div>
 	</div>
 
-	<!-- <div><a href="javascript:;" @click="emptydb">清空数据库</a></div> -->
-
 	<div v-show="message.opened" class="message">
 		<div class="message-head">温馨提示：</div>
 		<div class="message-body" v-html="message.content"></div>
@@ -286,9 +284,17 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="kd-buttons">
+		<a class="kd-button kd-button-up" href="javascript:;" @click="downloadFromServer">下载服务器数据</a>
+		<a class="kd-button kd-button-down" href="javascript:;" @click="upload2server">保存数据到服务器</a>
+		<!-- <a class="kd-button" href="javascript:;" @click="emptydb">清空数据库</a> -->
+	</div>
 </div>
 <div class="page-loading" id="page-loading"><div class="page-loading-text">请耐心骚等，<br>努力加载中...</div></div>
 <script src="./script/vue@2.4.2.js"></script>
+<script src="./script/axios.min.js"></script>
+<script src="./script/base64.min.js"></script>
 <script src="./script/utils.js"></script>
 <script src="./script/crsdb.js"></script>
 <script src="./script/crsapp.js"></script>
