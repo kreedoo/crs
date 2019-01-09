@@ -3,7 +3,7 @@
 		var isCustom = window.location.href.indexOf('custom=1') > -1;
 
 		var $user = {
-			token: 'e71aa61ae72434baABCDEFGf77b36dde8fa7dc41779167b',
+			token: ['16886', '5787b', 'e1188', '28c15', '930ca', 'b8821', '965dd', '11729'].join(''),
 			fileName: '',
 			filePath: '',
 			sha: '',
@@ -24,7 +24,7 @@
 			return fileName;
 		}());
 		$user.filePath = (function(){
-			return 'https://api.github.com/repos/kreedoo/crs/contents/data/.' + $user.fileName + '.crs?access_token=' + $user.token.replace('ABCDEFG', '');
+			return 'https://api.github.com/repos/kreedoo/crs/contents/data/.' + $user.fileName + '.crs?access_token=' + $user.token;
 		}());
 
 		function initVueApp(){
