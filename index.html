@@ -4,304 +4,299 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0">
 <title>crs</title>
-<link href="style/main.css" rel="stylesheet">
+<link href="style/main.css?v=1547008507843" rel="stylesheet">
 </head>
 <body>
 <div class="page" id="app" style="display: none;">
-	<div v-if="user.name !== 'admin'">
-		<ul class="nav">
-			<li v-for="item in navItems" :data-id="item.id" :key="item.id" class="nav-item" v-if="(isCustom && item.id === 'initdata') || item.id !== 'initdata'"><a class="nav-link" href="javascript:;" :class="{active: currentNavItem === item.id}" @click="currentNavItem = item.id">{{ item.name }}表</a></li>
-		</ul>
+	<ul class="nav">
+		<li v-for="item in navItems" :data-id="item.id" :key="item.id" class="nav-item" v-if="(isCustom && item.id === 'initdata') || item.id !== 'initdata'"><a class="nav-link" href="javascript:;" :class="{active: currentNavItem === item.id}" @click="currentNavItem = item.id">{{ item.name }}表</a></li>
+	</ul>
 
-		<div class="filter" v-if="currentNavItem === 'deals'">
-			<div class="filter-item" v-for="(filter, filterIndex) in filters" :key="filter.type + filterIndex">
-				按
-				<label class="kd-textinput">
-					<select v-model="filter.type" @change="doFilterTypeChange(filter)">
-						<option :value="flItem.id" v-for="flItem in filterList" :disabled="flItem.selected">{{ flItem.name }}</option>
-					</select>
-				</label>
-				查询
-				<label v-if="filter.type !== 'all'" class="kd-textinput">
-					<input v-if="filter.type === 'month'" type="month" v-model="filter.value">
-					<input v-else-if="filter.type === 'telephone'" type="number" v-model.number="filter.value" placeholder="请输入电话号码">
-					<select v-else-if="filter.type === 'status'" v-model="filter.value">
-						<option :value="statusKey" v-for="(statusName, statusKey) in statusMapping">{{ statusName }}</option>
-					</select>
-					<select v-else-if="filter.type === 'product'" v-model="filter.value">
-						<option :value="p.id" v-for="p in products">{{ p.name }}</option>
-					</select>
-					<input v-else type="text" v-model="filter.value" placeholder="请输入关键字">
-				</label>
-				<a class="filter-item-close" href="javascript:;" v-if="filterIndex > 0" @click="deleteFilterCondition(filterIndex)">删除</a>
-			</div>
-
-			<a class="add-filter-condition" href="javascript:;" @click="addFilterCondition">+ 添加过滤条件</a>
-
-			<div class="filter-item">
-				按
-				<label class="kd-textinput">
-					<select v-model="filterSort.field">
-						<option value="id">订单编码</option>
-						<option value="name">客户姓名</option>
-						<option value="deliveryDate">分娩日期</option>
-						<option value="telephone">手机号码</option>
-						<option value="address">地址</option>
-						<option value="introducer">介绍人</option>
-						<option value="quantity">产品数量</option>
-						<option value="dealDate">交易日期</option>
-						<option value="companyAllowance">公司补贴</option>
-						<option value="trafficAllowance">交通补贴</option>
-					</select>
-				</label>
-				进行
-				<label class="kd-textinput">
-					<select v-model="filterSort.type">
-						<option value="asc">升序</option>
-						<option value="desc">降序</option>
-					</select>
-				</label>
-			</div>
-
-			<a class="kd-button kd-button-start-filter" href="javascript:;" @click="startToSearch">开始查询</a>
-		</div>
-
-		<div v-if="currentNavItem === 'deals'">
-			<div class="list-counter">共 {{ dealsSearchResult.length }} 条{{ navItemsMapping[currentNavItem].name }} <a href="javascript:;" @click="openPrompt">添加新{{ navItemsMapping[currentNavItem].name }}</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:;" @click="exportExcel" v-if="dealsSearchResult.length > 0">下载明细表</a></div>
-			<div class="list-counter">总抽成：￥{{ allPoints.total }} = 成交抽成：￥{{ allPoints.success }} + 失单补贴：￥{{ allPoints.fail }}</div>
-			<ol class="list">
-				<li class="list-item" :class="{opened: item.openedDetail}" v-for="(item, index) in dealsSearchResult" :data-id="item.id" :key="item.id">
-					<div v-if="customersMapping[item.customerId]">
-						<div class="list-item-row" v-if="customersMapping[item.customerId].name"><span>客户姓名：</span><span>{{ customersMapping[item.customerId].name }} | 编码：{{ item.customerId }}</span></div>
-						<div class="list-item-row" v-if="customersMapping[item.customerId].telephone"><span>客户电话：</span><span>{{ customersMapping[item.customerId].telephone }}</span></div>
-						<div class="list-item-row" v-if="customersMapping[item.customerId].address"><span>客户地址：</span><span>{{ customersMapping[item.customerId].address }}</span></div>
-						<div class="list-item-row" v-if="customersMapping[item.customerId].introducer"><span>推荐人：</span><span>{{ customersMapping[item.customerId].introducer  }}</span></div>
-					</div>
-					<div class="list-item-row"><span>订单日期：</span><span>{{ item.dealDate }}</span></div>
-					<div class="list-item-row"><span>订单状态：</span><span>{{ statusMapping[item.status] }}{{ item.status === 'other' ? '-详见备注' : '' }}</span></div>
-					<div class="list-item-row" v-if="item.comment"><span>订单备注：</span><span>{{ item.comment }}</span></div>
-					<div class="list-item-row" v-if="item.products.length > 0"><span>所买产品：</span><span v-if="item.products.length === 0">-</span></div>
-					<ol v-if="item.products.length > 0">
-						<li v-for="(p, pIndex) in item.products">{{ p.name }} ￥{{ p.price }} * {{ p.quantity }}次</li>
-					</ol>
-					<div class="list-item-row" v-if="item.status === 'success'"><span>抽成点数：</span><span>￥{{ calcYourPoint(item) }}</span></div>
-					<div class="list-item-row" v-if="item.companyAllowance"><span>公司补贴：</span><span>￥{{ item.companyAllowance }}</span></div>
-					<div class="list-item-row" v-if="item.trafficAllowance"><span>交通补贴：</span><span>￥{{ item.trafficAllowance }}</span></div>
-					
-					<div class="list-item-action">
-						<a class="list-item-button" href="javascript:;" @click="edit(item.id)">编辑</a>
-						<a class="list-item-button" href="javascript:;" @click="doDelete(item.id)">删除</a>
-					</div>
-				</li>
-			</ol>
-		</div>
-		<div v-if="currentNavItem === 'customers'">
-			<div class="list-counter">共 {{ customers.length }} 位{{ navItemsMapping[currentNavItem].name }} <a href="javascript:;" @click="openPrompt">添加新{{ navItemsMapping[currentNavItem].name }}</a></div>
-			<ol class="list">
-				<li class="list-item" v-for="item in search('customers')" :data-id="item.id" :key="item.id">
-					<div class="list-item-row"><span>客户姓名：</span><span>{{ item.name }} | 编码：{{ item.id }}</span></div>
-					<div class="list-item-row" v-if="item.introducer"><span>介绍人：</span><span>{{ item.introducer }}</span></div>
-					<div class="list-item-row"><span>电话：</span><span>{{ item.telephone }}</span></div>
-					<div class="list-item-row"><span>地址：</span><span>{{ item.address || '-' }}</span></div>
-					<div class="list-item-row"><span>分娩日期：</span><span>{{ item.deliveryDate }}</span></div>
-					<div class="list-item-action">
-						<a class="list-item-button" href="javascript:;" @click="edit(item.id)">编辑</a>
-						<!-- <a class="list-item-button" href="javascript:;" @click="viewDeals(item.id)">查看订单</a> -->
-						<a class="list-item-button" href="javascript:;" @click="doDelete(item.id)">删除</a>
-					</div>
-				</li>
-			</ol>
-		</div>
-		<div v-if="currentNavItem === 'products'">
-			<div class="list-counter">共 {{ products.length }} 款{{ navItemsMapping[currentNavItem].name }} <a href="javascript:;" @click="openPrompt">添加新{{ navItemsMapping[currentNavItem].name }}</a></div>
-			<ol class="list">
-				<li class="list-item" v-for="item in search('products')" :data-id="item.id" :key="item.id">
-					<div class="list-item-row"><span>名称：</span><span>{{ item.name }}</span></div>
-					<div class="list-item-row" v-for="(p, pIndex) in item.price">
-						<div class="clearfix price-rule-title">价格规则{{ pIndex + 1 }}</div>
-						<div class="clearfix"><span>价格：</span><span>￥{{ p[0] }}</span></div>
-						<div class="clearfix"><span>抽点：</span><span>{{ p[1] < 1 ? (p[1] * 100 + '%') : ('￥' + p[1]) }}</span></div>
-					</div>
-					<div class="list-item-action">
-						<a class="list-item-button" href="javascript:;" @click="edit(item.id)">编辑</a>
-						<a class="list-item-button" href="javascript:;" @click="doDelete(item.id)">删除</a>
-					</div>
-				</li>
-			</ol>
-		</div>
-		<div v-if="currentNavItem === 'settings'">
-			<div class="list-counter">共 {{ settings.length }} 款{{ navItemsMapping[currentNavItem].name }} <a href="javascript:;" @click="openPrompt">添加新{{ navItemsMapping[currentNavItem].name }}</a></div>
-			<ol class="list">
-				<li class="list-item" v-for="item in settings" :data-id="item.id" :key="item.id">
-					<div class="list-item-row"><span>名称：</span><span>{{ item.name }}</span></div>
-					<div class="list-item-row"><span>配置：</span><span>{{ item.value }}</span></div>
-					<div class="list-item-action">
-						<a class="list-item-button" href="javascript:;" @click="edit(item.id)">编辑</a>
-						<a class="list-item-button" href="javascript:;" @click="doDelete(item.id)">删除</a>
-					</div>
-				</li>
-			</ol>
-		</div>
-		<div v-if="currentNavItem === 'initdata'" class="initdata">
-	        <label class="kd-file">选择数据源文件+<input type="file" @change="uploadData"></label>
-	        <div>或者 手动输入</div>
-			<div class="kd-textinput">
-				<textarea v-model="initdatacontent" placeholder="输入数据结构"></textarea>
-			</div>
-			<!-- <div class="kd-textinput">
-				<select v-model="inittype">
-					<option value="coverStructures">覆盖数据结构</option>
-					<option value="mergeStructures">合并数据结构</option>
-					<option value="coverData">覆盖数据</option>
-					<option value="mergeData">合并数据</option>
+	<div class="filter" v-if="currentNavItem === 'deals'">
+		<div class="filter-item" v-for="(filter, filterIndex) in filters" :key="filter.type + filterIndex">
+			按
+			<label class="kd-textinput">
+				<select v-model="filter.type" @change="doFilterTypeChange(filter)">
+					<option :value="flItem.id" v-for="flItem in filterList" :disabled="flItem.selected">{{ flItem.name }}</option>
 				</select>
-			</div> -->
-			<div class="buttons-box clearfix">
-				<a class="kd-button" href="javascript:;" @click="exportdata">导出数据</a>
-				<a class="kd-button" href="javascript:;" @click="importdata">导入数据</a>
-			</div>
+			</label>
+			查询
+			<label v-if="filter.type !== 'all'" class="kd-textinput">
+				<input v-if="filter.type === 'month'" type="month" v-model="filter.value">
+				<input v-else-if="filter.type === 'telephone'" type="number" v-model.number="filter.value" placeholder="请输入电话号码">
+				<select v-else-if="filter.type === 'status'" v-model="filter.value">
+					<option :value="statusKey" v-for="(statusName, statusKey) in statusMapping">{{ statusName }}</option>
+				</select>
+				<select v-else-if="filter.type === 'product'" v-model="filter.value">
+					<option :value="p.id" v-for="p in products">{{ p.name }}</option>
+				</select>
+				<input v-else type="text" v-model="filter.value" placeholder="请输入关键字">
+			</label>
+			<a class="filter-item-close" href="javascript:;" v-if="filterIndex > 0" @click="deleteFilterCondition(filterIndex)">删除</a>
 		</div>
 
-		<div v-show="message.opened" class="message">
-			<div class="message-head">温馨提示：</div>
-			<div class="message-body" v-html="message.content"></div>
-			<div class="message-action clearfix" v-if="message.hasButton">
-				<a class="kd-button kd-button-msg-confirm" href="javascript:;" @click="msgConfirm">确认</a>
-				<a class="kd-button kd-button-msg-cancel" href="javascript:;" @click="msgClose">取消</a>
-			</div>
-			<a class="message-close" href="javascript:;" @click="msgClose" v-if="!message.hasButton">关闭</a>
+		<a class="add-filter-condition" href="javascript:;" @click="addFilterCondition">+ 添加过滤条件</a>
+
+		<div class="filter-item">
+			按
+			<label class="kd-textinput">
+				<select v-model="filterSort.field">
+					<option value="id">订单编码</option>
+					<option value="name">客户姓名</option>
+					<option value="deliveryDate">分娩日期</option>
+					<option value="telephone">手机号码</option>
+					<option value="address">地址</option>
+					<option value="introducer">介绍人</option>
+					<option value="quantity">产品数量</option>
+					<option value="dealDate">交易日期</option>
+					<option value="companyAllowance">公司补贴</option>
+					<option value="trafficAllowance">交通补贴</option>
+				</select>
+			</label>
+			进行
+			<label class="kd-textinput">
+				<select v-model="filterSort.type">
+					<option value="asc">升序</option>
+					<option value="desc">降序</option>
+				</select>
+			</label>
 		</div>
 
-		<div v-if="showedPrompt" class="prompt">
-			<div class="prompt-box" :class="'prompt-' + currentNavItem">
-				<a href="javascript:;" @click="closePrompt" class="prompt-close">关闭</a>
-				<div class="form-title">{{ navItemsMapping[currentNavItem].name }}</div>
+		<a class="kd-button kd-button-start-filter" href="javascript:;" @click="startToSearch">开始查询</a>
+	</div>
 
-				<div v-if="currentNavItem === 'products'">
-					<label class="form-field">
-						<span class="form-field-title">产品名称：</span>
-						<input type="text" id="productName" v-model="product.name" placeholder="请输入产品名称">
-					</label>
-					<div v-for="(pp, ppIndex) in product.price">
-						<div class="form-field product-price-rule">价格规则 {{ ppIndex + 1 }} <a class="button-delete-price-rule" href="javascript:;" @click="deletePriceRule(ppIndex)" v-if="ppIndex > 0">- 删除</a></div>
-						<label class="form-field">
-							<span class="form-field-title">产品价格：</span>
-							<input type="number" id="productPrice" v-model.number="pp[0]" placeholder="请输入产品价格">
-						</label>
-						<label class="form-field">
-							<span class="form-field-title">抽成点数：</span>
-							<input type="number" id="productPoint" v-model.number="pp[1]" placeholder="请输入您的抽点">
-						</label>
-					</div>
-					<div class="button-box-adding-price-rule">
-						<a class="button-adding-price-rule" href="javascript:;" @click="addPriceRule">+ 增加价格规则</a>
-					</div>
+	<div v-if="currentNavItem === 'deals'">
+		<div class="list-counter">共 {{ dealsSearchResult.length }} 条{{ navItemsMapping[currentNavItem].name }} <a href="javascript:;" @click="openPrompt">添加新{{ navItemsMapping[currentNavItem].name }}</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:;" @click="exportExcel" v-if="dealsSearchResult.length > 0">下载明细表</a></div>
+		<div class="list-counter">总抽成：￥{{ allPoints.total }} = 成交抽成：￥{{ allPoints.success }} + 失单补贴：￥{{ allPoints.fail }}</div>
+		<ol class="list">
+			<li class="list-item" :class="{opened: item.openedDetail}" v-for="(item, index) in dealsSearchResult" :data-id="item.id" :key="item.id">
+				<div v-if="customersMapping[item.customerId]">
+					<div class="list-item-row" v-if="customersMapping[item.customerId].name"><span>客户姓名：</span><span>{{ customersMapping[item.customerId].name }} | 编码：{{ item.customerId }}</span></div>
+					<div class="list-item-row" v-if="customersMapping[item.customerId].telephone"><span>客户电话：</span><span>{{ customersMapping[item.customerId].telephone }}</span></div>
+					<div class="list-item-row" v-if="customersMapping[item.customerId].address"><span>客户地址：</span><span>{{ customersMapping[item.customerId].address }}</span></div>
+					<div class="list-item-row" v-if="customersMapping[item.customerId].introducer"><span>推荐人：</span><span>{{ customersMapping[item.customerId].introducer  }}</span></div>
 				</div>
-				<div v-else-if="currentNavItem === 'settings'">
-					<label class="form-field">
-						<span class="form-field-title">配置名称：</span>
-						<input type="text" id="settingName" v-model="setting.name" placeholder="请输入配置名称">
-					</label>
-					<label class="form-field">
-						<span class="form-field-title">配置内容：</span>
-						<input type="text" id="settingValue" v-model="setting.value" placeholder="请输入配置内容">
-					</label>
+				<div class="list-item-row"><span>订单日期：</span><span>{{ item.dealDate }}</span></div>
+				<div class="list-item-row"><span>订单状态：</span><span>{{ statusMapping[item.status] }}{{ item.status === 'other' ? '-详见备注' : '' }}</span></div>
+				<div class="list-item-row" v-if="item.comment"><span>订单备注：</span><span>{{ item.comment }}</span></div>
+				<div class="list-item-row" v-if="item.products.length > 0"><span>所买产品：</span><span v-if="item.products.length === 0">-</span></div>
+				<ol v-if="item.products.length > 0">
+					<li v-for="(p, pIndex) in item.products">{{ p.name }} ￥{{ p.price }} * {{ p.quantity }}次</li>
+				</ol>
+				<div class="list-item-row" v-if="item.status === 'success'"><span>抽成点数：</span><span>￥{{ calcYourPoint(item) }}</span></div>
+				<div class="list-item-row" v-if="item.companyAllowance"><span>公司补贴：</span><span>￥{{ item.companyAllowance }}</span></div>
+				<div class="list-item-row" v-if="item.trafficAllowance"><span>交通补贴：</span><span>￥{{ item.trafficAllowance }}</span></div>
+				
+				<div class="list-item-action">
+					<a class="list-item-button" href="javascript:;" @click="edit(item.id)">编辑</a>
+					<a class="list-item-button" href="javascript:;" @click="doDelete(item.id)">删除</a>
 				</div>
-				<div v-else>
-					<div class="form-field form-field-newcustomer" v-if="currentNavItem === 'deals'">
-						<label class="form-field-title" for="dealNewCustomer">是否为新客户：</label>
-						<label class="kd-checkbox" :class="{checked: deal.newCustomer}"><input type="checkbox" v-model="deal.newCustomer" id="dealNewCustomer"></label>
-					</div>
-					<div v-if="deal.newCustomer || currentNavItem === 'customers'">
-						<label class="form-field">
-							<span class="form-field-title">客户姓名：</span>
-							<input type="text" id="customerName" v-model="customer.name" placeholder="请输入客户姓名">
-						</label>
-						<label class="form-field">
-							<span class="form-field-title">介绍人：</span>
-							<input type="text" id="customerIntroducer" v-model="customer.introducer" placeholder="如有介绍人，请填写">
-						</label>
-						<label class="form-field">
-							<span class="form-field-title">电话：</span>
-							<input type="number" id="customerTelephone" v-model.number="customer.telephone" placeholder="请输入客户电话">
-						</label>
-						<label class="form-field">
-							<span class="form-field-title">地址：</span>
-							<input type="text" id="customer.address" v-model="customer.address" placeholder="请输入联系地址">
-						</label>
-						<label class="form-field">
-							<span class="form-field-title">分娩日期：</span>
-							<input type="date" id="customerDeliveryDate" v-model="customer.deliveryDate" placeholder="请输入客户的分娩日期">
-						</label>
-					</div>
-					<label class="form-field" v-else>
-						<span class="form-field-title">选择客户：</span>
-						<select v-model="deal.customerId">
-							<option v-for="item in customers" :value="item.id">{{ item.name }} {{ item.telephone }}</option>
-						</select>
-					</label>
-
-					<div v-if="currentNavItem === 'deals'">
-						<label class="form-field">
-							<span class="form-field-title">交易日期：</span>
-							<input type="date" v-model="deal.dealDate">
-						</label>
-						<label class="form-field">
-							<span class="form-field-title">交易情况：</span>
-							<select v-model="deal.status">
-								<option :value="statusKey" v-for="(statusName, statusKey) in statusMapping">{{ statusName }}</option>
-							</select>
-						</label>
-						<label class="form-field form-field-comment" v-if="deal.status === 'other'">
-							<span class="form-field-title">情况描述：</span>
-							<textarea v-model="deal.comment" placeholder="请输入客户的情况描述"></textarea>
-						</label>
-						<div class="form-field form-field-products" v-if="deal.status === 'success'">
-							<span class="form-field-title">购买产品： </span>
-							<div class="form-field-body">
-								<div class="form-field-product clearfix" v-for="(item, index) in deal.products" :key="item.id">
-									<label class="form-field-pname"><label class="kd-checkbox" :class="{checked: item.selected}"><input type="checkbox" v-model="item.selected"></label> <span>{{ item.name }}</span></label>
-									<label class="form-field-pprice" v-if="productsMapping[item.id]"><span>￥</span> <select v-model.number="item.price">
-										<option :value="p[0]" v-for="(p, pIndex) in productsMapping[item.id].price">{{ p[0] }}</option>
-									</select></label>
-									<label class="form-field-pquantity" v-if="item.selected"><span>数量</span> <input type="number" v-model.number="item.quantity"></label>
-								</div>
-							</div>
-						</div>
-						<label class="form-field" v-if="deal.status !== 'other'">
-							<span class="form-field-title">公司补贴：</span>
-							<input type="number" v-model.number="deal.companyAllowance" placeholder="请输入公司的补贴">
-						</label>
-						<label class="form-field" v-if="deal.status === 'success'">
-							<span class="form-field-title">交通补贴：</span>
-							<input type="number" v-model.number="deal.trafficAllowance" placeholder="请输入您的交通费用">
-						</label>
-					</div>
+			</li>
+		</ol>
+	</div>
+	<div v-if="currentNavItem === 'customers'">
+		<div class="list-counter">共 {{ customers.length }} 位{{ navItemsMapping[currentNavItem].name }} <a href="javascript:;" @click="openPrompt">添加新{{ navItemsMapping[currentNavItem].name }}</a></div>
+		<ol class="list">
+			<li class="list-item" v-for="item in search('customers')" :data-id="item.id" :key="item.id">
+				<div class="list-item-row"><span>客户姓名：</span><span>{{ item.name }} | 编码：{{ item.id }}</span></div>
+				<div class="list-item-row" v-if="item.introducer"><span>介绍人：</span><span>{{ item.introducer }}</span></div>
+				<div class="list-item-row"><span>电话：</span><span>{{ item.telephone }}</span></div>
+				<div class="list-item-row"><span>地址：</span><span>{{ item.address || '-' }}</span></div>
+				<div class="list-item-row"><span>分娩日期：</span><span>{{ item.deliveryDate }}</span></div>
+				<div class="list-item-action">
+					<a class="list-item-button" href="javascript:;" @click="edit(item.id)">编辑</a>
+					<!-- <a class="list-item-button" href="javascript:;" @click="viewDeals(item.id)">查看订单</a> -->
+					<a class="list-item-button" href="javascript:;" @click="doDelete(item.id)">删除</a>
 				</div>
-
-				<div class="prompt-action clearfix">
-					<a class="kd-button kd-button-confirm" href="javascript:;" @click="doUpdate">{{ editingMode !== false ? '编辑' : '添加' }}</a>
-					<a class="kd-button kd-button-reset" href="javascript:;" @click="reset(currentNavItem)">重填</a>
+			</li>
+		</ol>
+	</div>
+	<div v-if="currentNavItem === 'products'">
+		<div class="list-counter">共 {{ products.length }} 款{{ navItemsMapping[currentNavItem].name }} <a href="javascript:;" @click="openPrompt">添加新{{ navItemsMapping[currentNavItem].name }}</a></div>
+		<ol class="list">
+			<li class="list-item" v-for="item in search('products')" :data-id="item.id" :key="item.id">
+				<div class="list-item-row"><span>名称：</span><span>{{ item.name }}</span></div>
+				<div class="list-item-row" v-for="(p, pIndex) in item.price">
+					<div class="clearfix price-rule-title">价格规则{{ pIndex + 1 }}</div>
+					<div class="clearfix"><span>价格：</span><span>￥{{ p[0] }}</span></div>
+					<div class="clearfix"><span>抽点：</span><span>{{ p[1] < 1 ? (p[1] * 100 + '%') : ('￥' + p[1]) }}</span></div>
 				</div>
-			</div>
+				<div class="list-item-action">
+					<a class="list-item-button" href="javascript:;" @click="edit(item.id)">编辑</a>
+					<a class="list-item-button" href="javascript:;" @click="doDelete(item.id)">删除</a>
+				</div>
+			</li>
+		</ol>
+	</div>
+	<div v-if="currentNavItem === 'settings'">
+		<div class="list-counter">共 {{ settings.length }} 款{{ navItemsMapping[currentNavItem].name }} <a href="javascript:;" @click="openPrompt">添加新{{ navItemsMapping[currentNavItem].name }}</a></div>
+		<ol class="list">
+			<li class="list-item" v-for="item in settings" :data-id="item.id" :key="item.id">
+				<div class="list-item-row"><span>名称：</span><span>{{ item.name }}</span></div>
+				<div class="list-item-row"><span>配置：</span><span>{{ item.value }}</span></div>
+				<div class="list-item-action">
+					<a class="list-item-button" href="javascript:;" @click="edit(item.id)">编辑</a>
+					<a class="list-item-button" href="javascript:;" @click="doDelete(item.id)">删除</a>
+				</div>
+			</li>
+		</ol>
+	</div>
+	<div v-if="currentNavItem === 'initdata'" class="initdata">
+        <label class="kd-file">选择数据源文件+<input type="file" @change="uploadData"></label>
+        <div>或者 手动输入</div>
+		<div class="kd-textinput">
+			<textarea v-model="initdatacontent" placeholder="输入数据结构"></textarea>
 		</div>
-
-		<div class="kd-buttons">
-			<a class="kd-button kd-button-up" href="javascript:;" @click="downloadFromServer">下载服务器数据</a>
-			<a class="kd-button kd-button-down" href="javascript:;" @click="upload2server">保存数据到服务器</a>
-			<!-- <a class="kd-button" href="javascript:;" @click="emptydb">清空数据库</a> -->
+		<!-- <div class="kd-textinput">
+			<select v-model="inittype">
+				<option value="coverStructures">覆盖数据结构</option>
+				<option value="mergeStructures">合并数据结构</option>
+				<option value="coverData">覆盖数据</option>
+				<option value="mergeData">合并数据</option>
+			</select>
+		</div> -->
+		<div class="buttons-box clearfix">
+			<a class="kd-button" href="javascript:;" @click="exportdata">导出数据</a>
+			<a class="kd-button" href="javascript:;" @click="importdata">导入数据</a>
 		</div>
 	</div>
-	<div v-else>
-		// amdin
+
+	<div v-show="message.opened" class="message">
+		<div class="message-head">温馨提示：</div>
+		<div class="message-body" v-html="message.content"></div>
+		<div class="message-action clearfix" v-if="message.hasButton">
+			<a class="kd-button kd-button-msg-confirm" href="javascript:;" @click="msgConfirm">确认</a>
+			<a class="kd-button kd-button-msg-cancel" href="javascript:;" @click="msgClose">取消</a>
+		</div>
+		<a class="message-close" href="javascript:;" @click="msgClose" v-if="!message.hasButton">关闭</a>
+	</div>
+
+	<div v-if="showedPrompt" class="prompt">
+		<div class="prompt-box" :class="'prompt-' + currentNavItem">
+			<a href="javascript:;" @click="closePrompt" class="prompt-close">关闭</a>
+			<div class="form-title">{{ navItemsMapping[currentNavItem].name }}</div>
+
+			<div v-if="currentNavItem === 'products'">
+				<label class="form-field">
+					<span class="form-field-title">产品名称：</span>
+					<input type="text" id="productName" v-model="product.name" placeholder="请输入产品名称">
+				</label>
+				<div v-for="(pp, ppIndex) in product.price">
+					<div class="form-field product-price-rule">价格规则 {{ ppIndex + 1 }} <a class="button-delete-price-rule" href="javascript:;" @click="deletePriceRule(ppIndex)" v-if="ppIndex > 0">- 删除</a></div>
+					<label class="form-field">
+						<span class="form-field-title">产品价格：</span>
+						<input type="number" id="productPrice" v-model.number="pp[0]" placeholder="请输入产品价格">
+					</label>
+					<label class="form-field">
+						<span class="form-field-title">抽成点数：</span>
+						<input type="number" id="productPoint" v-model.number="pp[1]" placeholder="请输入您的抽点">
+					</label>
+				</div>
+				<div class="button-box-adding-price-rule">
+					<a class="button-adding-price-rule" href="javascript:;" @click="addPriceRule">+ 增加价格规则</a>
+				</div>
+			</div>
+			<div v-else-if="currentNavItem === 'settings'">
+				<label class="form-field">
+					<span class="form-field-title">配置名称：</span>
+					<input type="text" id="settingName" v-model="setting.name" placeholder="请输入配置名称">
+				</label>
+				<label class="form-field">
+					<span class="form-field-title">配置内容：</span>
+					<input type="text" id="settingValue" v-model="setting.value" placeholder="请输入配置内容">
+				</label>
+			</div>
+			<div v-else>
+				<div class="form-field form-field-newcustomer" v-if="currentNavItem === 'deals'">
+					<label class="form-field-title" for="dealNewCustomer">是否为新客户：</label>
+					<label class="kd-checkbox" :class="{checked: deal.newCustomer}"><input type="checkbox" v-model="deal.newCustomer" id="dealNewCustomer"></label>
+				</div>
+				<div v-if="deal.newCustomer || currentNavItem === 'customers'">
+					<label class="form-field">
+						<span class="form-field-title">客户姓名：</span>
+						<input type="text" id="customerName" v-model="customer.name" placeholder="请输入客户姓名">
+					</label>
+					<label class="form-field">
+						<span class="form-field-title">介绍人：</span>
+						<input type="text" id="customerIntroducer" v-model="customer.introducer" placeholder="如有介绍人，请填写">
+					</label>
+					<label class="form-field">
+						<span class="form-field-title">电话：</span>
+						<input type="number" id="customerTelephone" v-model.number="customer.telephone" placeholder="请输入客户电话">
+					</label>
+					<label class="form-field">
+						<span class="form-field-title">地址：</span>
+						<input type="text" id="customer.address" v-model="customer.address" placeholder="请输入联系地址">
+					</label>
+					<label class="form-field">
+						<span class="form-field-title">分娩日期：</span>
+						<input type="date" id="customerDeliveryDate" v-model="customer.deliveryDate" placeholder="请输入客户的分娩日期">
+					</label>
+				</div>
+				<label class="form-field" v-else>
+					<span class="form-field-title">选择客户：</span>
+					<select v-model="deal.customerId">
+						<option v-for="item in customers" :value="item.id">{{ item.name }} {{ item.telephone }}</option>
+					</select>
+				</label>
+
+				<div v-if="currentNavItem === 'deals'">
+					<label class="form-field">
+						<span class="form-field-title">交易日期：</span>
+						<input type="date" v-model="deal.dealDate">
+					</label>
+					<label class="form-field">
+						<span class="form-field-title">交易情况：</span>
+						<select v-model="deal.status">
+							<option :value="statusKey" v-for="(statusName, statusKey) in statusMapping">{{ statusName }}</option>
+						</select>
+					</label>
+					<label class="form-field form-field-comment" v-if="deal.status === 'other'">
+						<span class="form-field-title">情况描述：</span>
+						<textarea v-model="deal.comment" placeholder="请输入客户的情况描述"></textarea>
+					</label>
+					<div class="form-field form-field-products" v-if="deal.status === 'success'">
+						<span class="form-field-title">购买产品： </span>
+						<div class="form-field-body">
+							<div class="form-field-product clearfix" v-for="(item, index) in deal.products" :key="item.id">
+								<label class="form-field-pname"><label class="kd-checkbox" :class="{checked: item.selected}"><input type="checkbox" v-model="item.selected"></label> <span>{{ item.name }}</span></label>
+								<label class="form-field-pprice" v-if="productsMapping[item.id]"><span>￥</span> <select v-model.number="item.price">
+									<option :value="p[0]" v-for="(p, pIndex) in productsMapping[item.id].price">{{ p[0] }}</option>
+								</select></label>
+								<label class="form-field-pquantity" v-if="item.selected"><span>数量</span> <input type="number" v-model.number="item.quantity"></label>
+							</div>
+						</div>
+					</div>
+					<label class="form-field" v-if="deal.status !== 'other'">
+						<span class="form-field-title">公司补贴：</span>
+						<input type="number" v-model.number="deal.companyAllowance" placeholder="请输入公司的补贴">
+					</label>
+					<label class="form-field" v-if="deal.status === 'success'">
+						<span class="form-field-title">交通补贴：</span>
+						<input type="number" v-model.number="deal.trafficAllowance" placeholder="请输入您的交通费用">
+					</label>
+				</div>
+			</div>
+
+			<div class="prompt-action clearfix">
+				<a class="kd-button kd-button-confirm" href="javascript:;" @click="doUpdate">{{ editingMode !== false ? '编辑' : '添加' }}</a>
+				<a class="kd-button kd-button-reset" href="javascript:;" @click="reset(currentNavItem)">重填</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="kd-buttons">
+		<a class="kd-button kd-button-up" href="javascript:;" @click="downloadFromServer">下载服务器数据</a>
+		<a class="kd-button kd-button-down" href="javascript:;" @click="upload2server">保存数据到服务器</a>
+		<!-- <a class="kd-button" href="javascript:;" @click="emptydb">清空数据库</a> -->
 	</div>
 </div>
 <div class="page-loading" id="page-loading"><div class="page-loading-text">请耐心骚等，<br>努力加载中...</div></div>
 <script src="./script/vue@2.4.2.js"></script>
 <script src="./script/axios.min.js"></script>
 <script src="./script/base64.min.js"></script>
-<script src="./script/utils.js"></script>
-<script src="./script/crsdb.js"></script>
-<script src="./script/crsapp.js"></script>
+<script src="./script/utils.js?v=1547008507843"></script>
+<script src="./script/crsdb.js?v=1547008507843"></script>
+<script src="./script/crsapp.js?v=1547008507843"></script>
 </body>
 </html>
