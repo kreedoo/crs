@@ -24,7 +24,7 @@
 			return fileName;
 		}());
 		$user.filePath = (function(){
-			return 'https://api.github.com/repos/kreedoo/crs/contents/data/.' + $user.fileName + '.crs?access_token=' + $user.token;
+			return 'https://api.github.com/repos/kreedoo/kddbyy/crsdata/.' + $user.fileName + '.crs?access_token=' + $user.token;
 		}());
 
 		function initVueApp(){
