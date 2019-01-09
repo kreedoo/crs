@@ -1106,7 +1106,13 @@
 
 		function userNotExist(){
 			let app = document.getElementById('app');
-			app.innerHTML = '<div style="padding: .5rem; text-align: center;">' + ($user.fileName === '' ? '欢迎光临，请联系管理员开户！' : ('对不起，用户`' + $user.fileName + '`不存在！')) + '</div>';
+			let text = '';
+			if($user.fileName === ''){
+				text = '欢迎使用本系统，<br>请联系管理员开户！';
+			}else{
+				text = '对不起，用户`' + $user.fileName + '`不存在！<br>请联系管理员开户！';
+			}
+			app.innerHTML = '<div class="page-loading"><div class="page-loading-text">' + text + '</div></div>';
 			app.style.display = '';
 		}
 
