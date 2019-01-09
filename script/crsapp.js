@@ -4,12 +4,12 @@
 
 		var $user = {
 			token: ['16886', '5787b', 'e1188', '28c15', '930ca', 'b8821', '965dd', '11729'].join(''),
-			fileName: '',
+			name: '',
 			filePath: '',
 			sha: '',
 			content: ''
 		};
-		$user.fileName = (function(){
+		$user.name = (function(){
 			let fileName = '';
 			let href = window.location.href;
 
@@ -24,7 +24,7 @@
 			return fileName;
 		}());
 		$user.filePath = (function(){
-			return 'https://api.github.com/repos/kreedoo/kddbyy/contents/crsdata/.' + $user.fileName + '.crs?access_token=' + $user.token;
+			return 'https://api.github.com/repos/kreedoo/kddbyy/contents/crsdata/.' + $user.name + '.crs?access_token=' + $user.token;
 		}());
 
 		function initVueApp(){
@@ -1087,7 +1087,7 @@
 		            	}));
 
 	            		axios.put(this.user.filePath, {
-							message: (this.user.sha ? 'update' : 'create') + ' .' + this.user.fileName + '.crs file',
+							message: (this.user.sha ? 'update' : 'create') + ' .' + this.user.name + '.crs file',
 							content: Base64.encode(content),
 							sha: this.user.sha && this.user.sha || null
 						}).then(json => {
@@ -1104,13 +1104,19 @@
 			});
 		}
 
+		function initVueAdmin(){
+			var app = new Vue({
+				//
+			});
+		}
+
 		function userNotExist(){
 			let app = document.getElementById('app');
 			let text = '';
-			if($user.fileName === ''){
+			if($user.name === ''){
 				text = '欢迎使用本系统，<br>请联系管理员开户！';
 			}else{
-				text = '对不起，用户`' + $user.fileName + '`不存在！<br>请联系管理员开户！';
+				text = '对不起，用户`' + $user.name + '`不存在！<br>请联系管理员开户！';
 			}
 			app.innerHTML = '<div class="page-loading"><div class="page-loading-text">' + text + '</div></div>';
 			app.style.display = '';
@@ -1132,7 +1138,11 @@
 				utils.setStorage('tableNextId', data.tableNextId); // 表的下一个ID*/
 
 				initCRSDB();
-				initVueApp();
+				if($user.name === 'admin'){
+					initVueAdmin();
+				}else{
+					initVueApp();
+				}
 			}else{
 				userNotExist();
 			}
