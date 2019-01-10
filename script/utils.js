@@ -25,7 +25,7 @@
     }
     function getStorage(key){
     	let jg = window.localStorage.getItem(key);
-    	return jg && JSON.parse(jg);
+    	return !!jg && JSON.parse(jg);
     }
     function setStorage(key, value){
     	return window.localStorage.setItem(key, JSON.stringify(value));

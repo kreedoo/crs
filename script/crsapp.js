@@ -150,16 +150,7 @@
 				},
 				created(){
 					if(this.user.sha){
-						this.downloadFromServer();
-
-						this.updateDataFromDB();
-
-						this.resetProduct();
-						this.resetCustomer();
-						this.resetDeal();
-
-						this.addFilterCondition();
-						this.searchDeals();
+						this.init();
 					}
 				},
 				watch: {
@@ -184,6 +175,33 @@
 					}
 				},
 				methods: {
+					init(){
+						this.updateDataToDB();
+						this.updateDataFromDB();
+
+						this.resetProduct();
+						this.resetCustomer();
+						this.resetDeal();
+
+						this.addFilterCondition();
+						this.searchDeals();
+					},
+					updateDataToDB(){
+            			if(this.user.content){
+		            		let data = Base64.decode(this.user.content);
+		            		data = JSON.parse(utils.b2a(data));
+
+							utils.setStorage('tableNames', data.tableNames); // 表的名称列表
+							utils.setStorage('structures', data.structures); // 表的结构
+							utils.setStorage('uniqueCode', data.uniqueCode); // 表的唯一字段
+							utils.setStorage('tableData', data.tableData); // 表的数据列表
+							utils.setStorage('tableNextId', data.tableNextId); // 表的下一个ID
+
+							$crsdb.init('storage');
+						}else{
+							$crsdb.init('cachedstructure');
+						}
+					},
 					doFilterTypeChange(filter){
 						this.filters = this.filters.map(item => {
 							if(item.type === filter.type){
@@ -1058,12 +1076,24 @@
 
 		            // async
 		            downloadFromServer(){
-		            	axios.get(this.user.filePath).then(json => {
+		            	return axios.get(this.user.filePath).then(json => {
 		            		if(!json.message){
 		            			$user.sha = json.data.sha;
 
-			            		let data = Base64.decode(json.data.content);
-			            		data = JSON.parse(utils.b2a(data));
+		            			let data = {
+									tableNames: [],
+									structures: {},
+									uniqueCode: {},
+									tableData: {},
+									tableNextId: {},
+		            			};
+
+		            			if(json.data.content){
+				            		data = Base64.decode(json.data.content);
+				            		data = JSON.parse(utils.b2a(data));
+								}else{
+									window.localStorage.clear();
+								}
 
 								utils.setStorage('tableNames', data.tableNames); // 表的名称列表
 								utils.setStorage('structures', data.structures); // 表的结构
@@ -1072,8 +1102,8 @@
 								utils.setStorage('tableNextId', data.tableNextId); // 表的下一个ID
 
 								// window.location.reload();
-								$crsdb.init([], 'storage');
-								this.updateDataFromDB();
+								$crsdb.init('storage');
+								this.init();
 							}else{
 								this.msgOpen('下载失败！');
 							}
@@ -1130,16 +1160,8 @@
 			if(!json.message){
 				document.getElementById('app').style.display = '';
 
-				$user.sha = json.data.sha;/*
-
-				let data = Base64.decode(json.data.content);
-				data = JSON.parse(utils.b2a(data));
-
-				utils.setStorage('tableNames', data.tableNames); // 表的名称列表
-				utils.setStorage('structures', data.structures); // 表的结构
-				utils.setStorage('uniqueCode', data.uniqueCode); // 表的唯一字段
-				utils.setStorage('tableData', data.tableData); // 表的数据列表
-				utils.setStorage('tableNextId', data.tableNextId); // 表的下一个ID*/
+				$user.sha = json.data.sha;
+				$user.content = json.data.content;
 
 				initCRSDB();
 				if($user.name === 'admin'){
@@ -1151,6 +1173,7 @@
 				userNotExist();
 			}
 		}).catch(e => {
+			console.log(e);
 			userNotExist();
 		});
 	}

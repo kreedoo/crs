@@ -1,9 +1,10 @@
 ;(function(){
 	class Database {
 		constructor(structures, initDatafrom){
-			this.init(structures, initDatafrom);
+			this.cachedStructures = structures;
+			this.init(initDatafrom);
 		}
-		init(structures = [], initDatafrom){
+		init(initDatafrom){
 			this.tableNames = []; // 表的名称列表
 			this.structures = {}; // 表的结构
 			this.uniqueCode = {}; // 表的唯一字段
@@ -22,7 +23,8 @@
 				this.tableNames.forEach(tableName => {
 					this._createMapping(tableName);
 				});
-			}else{
+			}else{ // custom
+				let structures = this.cachedStructures;
 				structures.forEach(item => {
 					this.tableNames.push(item.name);
 					this.structures[item.name] = item.fields;
