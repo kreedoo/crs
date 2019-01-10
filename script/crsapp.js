@@ -150,6 +150,8 @@
 				},
 				created(){
 					if(this.user.sha){
+						this.downloadFromServer();
+
 						this.updateDataFromDB();
 
 						this.resetProduct();
@@ -1069,7 +1071,9 @@
 								utils.setStorage('tableData', data.tableData); // 表的数据列表
 								utils.setStorage('tableNextId', data.tableNextId); // 表的下一个ID
 
-								window.location.reload();
+								// window.location.reload();
+								$crsdb.init([], 'storage');
+								this.updateDataFromDB();
 							}else{
 								this.msgOpen('下载失败！');
 							}

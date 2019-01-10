@@ -1,6 +1,9 @@
 ;(function(){
 	class Database {
 		constructor(structures, initDatafrom){
+			this.init(structures, initDatafrom);
+		}
+		init(structures = [], initDatafrom){
 			this.tableNames = []; // 表的名称列表
 			this.structures = {}; // 表的结构
 			this.uniqueCode = {}; // 表的唯一字段
@@ -9,9 +12,6 @@
 
 			this.mapping = {}; // 表的索引
 
-			this.init(structures, initDatafrom);
-		}
-		init(structures = [], initDatafrom){
 			if(initDatafrom === 'storage' && utils.getStorage('structures') !== null){ // from window.localStorage
 				this.tableNames = utils.getStorage('tableNames') || [];
 				this.structures = utils.getStorage('structures') || {};
