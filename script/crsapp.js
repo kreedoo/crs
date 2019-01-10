@@ -1032,9 +1032,9 @@
 
 			            let excelCode = template.replace(/{(\w+)}/g, (m, p) => ctx[p]);
 
-			            // window.location.href = uri + utils.base64(excelCode);
+			            // window.location.href = uri + Base64.encode(excelCode);
 			            let link = document.createElement('a');
-						link.href = uri + utils.base64(excelCode);
+						link.href = uri + Base64.encode(excelCode);
 						link.download = this.generateExcelName()  + '催乳师明细表.xls';
 						link.click();
 					},
@@ -1112,26 +1112,31 @@
 		            	});
 		            },
 		            upload2server(){
-		            	let content = utils.a2b(JSON.stringify({
-							tableNames: $crsdb.tableNames,
-							structures: $crsdb.structures,
-							uniqueCode: $crsdb.uniqueCode,
-							tableData: $crsdb.tableData,
-							tableNextId: $crsdb.tableNextId
-		            	}));
+		            	this.msgOpen(`<p>请确认要“<strong>保存数据到服务器</strong>”！<br>
+		            		您的数据默认会存储于本地，为了<strong>数据不丢失</strong>，您可以隔三差五执行此操作，将数据永久保存在服务器上，以免丢失！</p>`, true, () => {
+		            		this.msgOpen('上传中，请骚等……！');
 
-	            		axios.put(this.user.filePath, {
-							message: (this.user.sha ? 'update' : 'create') + ' .' + this.user.name + '.crs file',
-							content: Base64.encode(content),
-							sha: this.user.sha && this.user.sha || null
-						}).then(json => {
-							if(json.message){
+			            	let content = utils.a2b(JSON.stringify({
+								tableNames: $crsdb.tableNames,
+								structures: $crsdb.structures,
+								uniqueCode: $crsdb.uniqueCode,
+								tableData: $crsdb.tableData,
+								tableNextId: $crsdb.tableNextId
+			            	}));
+
+		            		axios.put(this.user.filePath, {
+								message: (this.user.sha ? 'update' : 'create') + ' .' + this.user.name + '.crs file',
+								content: Base64.encode(content),
+								sha: this.user.sha && this.user.sha || null
+							}).then(json => {
+								if(json.message){
+									this.msgOpen('上传失败！');
+								}else{
+									this.msgOpen('上传成功！');
+								}
+							}).catch(e => {
 								this.msgOpen('上传失败！');
-							}else{
-								this.msgOpen('上传成功！');
-							}
-						}).catch(e => {
-							this.msgOpen('上传失败！');
+							});
 						});
 		            }
 				}

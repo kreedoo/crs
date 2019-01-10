@@ -10,6 +10,7 @@
 <div class="page" id="app" style="display: none;">
 	<ul class="nav">
 		<li v-for="item in navItems" :data-id="item.id" :key="item.id" class="nav-item" v-if="(isCustom && item.id === 'initdata') || item.id !== 'initdata'"><a class="nav-link" href="javascript:;" :class="{active: currentNavItem === item.id}" @click="currentNavItem = item.id">{{ item.name }}表</a></li>
+		<li class="nav-item"><a class="nav-link" href="javascript:;" @click="upload2server">保存数据到服务器</a></li>
 	</ul>
 
 	<div class="filter" v-if="currentNavItem === 'deals'">
@@ -286,8 +287,8 @@
 	</div>
 
 	<div class="kd-buttons">
-		<a class="kd-button kd-button-up" href="javascript:;" @click="downloadFromServer" v-if="false">下载服务器数据</a>
-		<a class="kd-button kd-button-down" href="javascript:;" @click="upload2server">保存数据到服务器</a>
+		<!-- <a class="kd-button kd-button-up" href="javascript:;" @click="downloadFromServer" v-if="false">下载服务器数据</a> -->
+		<!-- <a class="kd-button kd-button-down" href="javascript:;" @click="upload2server">保存数据到服务器</a> -->
 		<!-- <a class="kd-button" href="javascript:;" @click="emptydb">清空数据库</a> -->
 	</div>
 </div>
