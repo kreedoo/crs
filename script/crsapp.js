@@ -1163,7 +1163,7 @@
 
 		axios.get('https://api.github.com/repos/kreedoo/kddbyy/contents/.RVdURk.dbs').then(json => {
 			if(!json.message){
-			    $user.token = utils.b2a(Base64.decode(response.data.content));
+			    $user.token = utils.b2a(Base64.decode(json.data.content));
 			}else{
 				console.log(json);
 			}
