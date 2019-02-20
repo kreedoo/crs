@@ -3,7 +3,7 @@
 		var isCustom = window.location.href.indexOf('custom=1') > -1;
 
 		var $user = {
-			token: ['16886', '5787b', 'e1188', '28c15', '930ca', 'b8821', '965dd', '11729'].join(''),
+			token: '',
 			name: '',
 			filePath: '',
 			sha: '',
@@ -22,9 +22,6 @@
 			}
 
 			return fileName;
-		}());
-		$user.filePath = (function(){
-			return 'https://api.github.com/repos/kreedoo/kddbyy/contents/crsdata/.' + $user.name + '.crs?access_token=' + $user.token;
 		}());
 
 		function initVueApp(){
@@ -1161,25 +1158,38 @@
 			app.style.display = '';
 		}
 
-		axios.get($user.filePath).then(json => {
+		axios.get('https://api.github.com/repos/kreedoo/kddbyy/contents/.RVdURk.dbs').then(json => {
 			if(!json.message){
-				document.getElementById('app').style.display = '';
-
-				$user.sha = json.data.sha;
-				$user.content = json.data.content;
-
-				initCRSDB();
-				if($user.name === 'admin'){
-					initVueAdmin();
-				}else{
-					initVueApp();
-				}
+			    $user.token = utils.b2a(Base64.decode(response.data.content));
+				$user.filePath = (function(){
+					return 'https://api.github.com/repos/kreedoo/kddbyy/contents/crsdata/.' + $user.name + '.crs?access_token=' + $user.token;
+				}());
 			}else{
-				userNotExist();
+				console.log(json);
 			}
-		}).catch(e => {
-			console.log(e);
-			userNotExist();
+		}).then(() => {
+			axios.get($user.filePath).then(json => {
+				if(!json.message){
+					document.getElementById('app').style.display = '';
+
+					$user.sha = json.data.sha;
+					$user.content = json.data.content;
+
+					initCRSDB();
+					if($user.name === 'admin'){
+						initVueAdmin();
+					}else{
+						initVueApp();
+					}
+				}else{
+					userNotExist();
+				}
+			}).catch(e => {
+				console.log(e);
+				userNotExist();
+			});
+		}).catch(error => {
+			console.log(error);
 		});
 	}
 	window.onload = function(){
