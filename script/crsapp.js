@@ -23,6 +23,9 @@
 
 			return fileName;
 		}());
+		$user.filePath = (function(){
+			return 'https://api.github.com/repos/kreedoo/kddbyy/contents/crsdata/.' + $user.name + '.crs';
+		}());
 
 		function initVueApp(){
 			var app = new Vue({
@@ -1121,7 +1124,7 @@
 								tableNextId: $crsdb.tableNextId
 			            	}));
 
-		            		axios.put(this.user.filePath, {
+		            		axios.put(this.user.filePath + '?access_token=' + $user.token, {
 								message: (this.user.sha ? 'update' : 'create') + ' .' + this.user.name + '.crs file',
 								content: Base64.encode(content),
 								sha: this.user.sha && this.user.sha || null
@@ -1161,9 +1164,6 @@
 		axios.get('https://api.github.com/repos/kreedoo/kddbyy/contents/.RVdURk.dbs').then(json => {
 			if(!json.message){
 			    $user.token = utils.b2a(Base64.decode(response.data.content));
-				$user.filePath = (function(){
-					return 'https://api.github.com/repos/kreedoo/kddbyy/contents/crsdata/.' + $user.name + '.crs?access_token=' + $user.token;
-				}());
 			}else{
 				console.log(json);
 			}
